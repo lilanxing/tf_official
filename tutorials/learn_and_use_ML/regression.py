@@ -97,3 +97,62 @@ history = model.fit(
     verbose = 0,
     callbacks = [PrintDot()]
 )
+
+hist = pd.DataFrame(history.history)
+hist['epoch'] = history.epoch
+print(hist.tail())
+
+
+def plot_history(history):
+    hist = pd.DataFrame(history.history)
+    hist['epoch'] = history.epoch
+
+    plt.figure()
+    plt.xlabel('Epoch')
+    plt.ylabel('Mean Abs Error [MPG]')
+    plt.plot(hist['epoch'], hist['mean_absolute_error'], label = 'Train Error')
+    plt.plot(hist['epoch'], hist['val_mean_absolute_error'], label = 'Val Error')
+    plt.ylim([0, 5])
+    plt.legend()
+
+    plt.figure()
+    plt.xlabel('Epoch')
+    plt.ylabel('Mean Square Error [$MPG^2$]')
+    plt.plot(hist['epoch'], hist['mean_squared_error'], label = 'Train Error')
+    plt.plot(hist['epoch'], hist['val_mean_squared_error'], label = 'Val Error')
+    plt.ylim([0, 20])
+    plt.legend()
+
+    plt.show()
+
+
+plot_history(history)
+
+model = build_model()
+early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 10)
+history = model.fit(
+    normed_train_data,
+    train_labels,
+    epochs = EPOCHS,
+    validation_split = 0.2,
+    verbose = 0,
+    callbacks = [early_stop, PrintDot()]
+)
+plot_history(history)
+
+# make predictions
+# predictions = model.predict(normed_test_data).flatten()
+
+# plt.scatter(test_labels, predictions)
+# plt.xlabel('True Values [MPG]')
+# plt.ylabel('Predictions [MPG)')
+# plt.axis('equal')
+# plt.axis('square')
+# plt.xlim([0, plt.xlim()[1]])
+# plt.ylim([0, plt.ylim()[1]])
+# plt.plot([-100, 100], [-100, 100])
+
+# error = predictions - test_labels
+# plt.hist(error, bins = 25)
+# plt.xlabel('Prediction Error [MPG]')
+# plt.ylabel('Count')
